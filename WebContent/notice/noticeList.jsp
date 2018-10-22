@@ -6,19 +6,33 @@
 <%
 	NoticeDAO nDAO = new NoticeDAO();
 	int curPage=1;
+	String kind = request.getParameter("kind");
+	String search = request.getParameter("search");
+	System.out.println("kind:"+kind);
+	System.out.println("search:"+search);
+	
+	if(kind==null){
+		kind="Title";
+	}
+	if(search==null){
+		search="";
+	}
+	
 	try{
 		curPage=Integer.parseInt(request.getParameter("curPage"));
+		kind = request.getParameter("kind");
+		
 	}catch(Exception e){
 		
 	}
 	int perPage=10;
 	int startRow = (curPage-1)*perPage+1;
 	int lastRow = curPage*perPage;
-	List<NoticeDTO> ar = nDAO.selectList(startRow, lastRow);
+	List<NoticeDTO> ar = nDAO.selectList(startRow, lastRow, kind, search);
 	
 	//페이징
 	//1. 전체 글의 갯수
-	int totalCount = nDAO.getCount();
+	int totalCount = nDAO.getCount(kind, search);
 	//2. 전체 페이지의 갯수
 	int totalPage = totalCount/perPage;
 	if(totalCount%perPage != 0){
@@ -263,6 +277,22 @@
 
 <div class="container-fluid">
 	<div class="row">
+		<div>
+			<form class="form-inline" action="./noticeList.jsp">
+				<div class="form-group">
+					<select class="form-control" id="sel1" name="kind">
+						<option>Title</option>
+						<option>Contents</option>
+						<option>Writer</option>
+					</select>
+				    <input type="text" class="form-control" id="search" placeholder="Enter search" name="search">
+				</div>
+				<button type="submit" class="btn btn-default">Submit</button>
+			</form>
+		</div>
+		
+		
+		
 		<table class="table table-hover">
 			<tr>
 				<td>NO</td>
@@ -304,17 +334,17 @@
 <div class="container-fluid">
 	<div class="row">
 		<ul class="pagination">
-			<li><a href="./noticeList.jsp?curPage=<%=1%>"><span class="glyphicon glyphicon-backward"></span></a></li>
+			<li><a href="./noticeList.jsp?curPage=<%=1%>&kind=<%=kind%>&search=<%=search%>"><span class="glyphicon glyphicon-backward"></span></a></li>
 				<%if(curBlock>1){ %>
-					<li><a href="./noticeList.jsp?curPage=<%=startNum-1%>"><span class="glyphicon glyphicon-chevron-left"></span></a></li>
+					<li><a href="./noticeList.jsp?curPage=<%=startNum-1%>&kind=<%=kind%>&search=<%=search%>"><span class="glyphicon glyphicon-chevron-left"></span></a></li>
 				<%} %>
 			    <%for(int i=startNum;i<=lastNum;i++){ %>
-					<li><a href="./noticeList.jsp?curPage=<%=i%>"><%=i%></a></li>
+					<li><a href="./noticeList.jsp?curPage=<%=i%>&kind=<%=kind%>&search=<%=search%>"><%=i%></a></li>
 			    <%} %>
 			    <%if(curBlock != totalBlock){ %>
-					<li><a href="./noticeList.jsp?curPage=<%=lastNum+1%>"><span class="glyphicon glyphicon-chevron-right"></span></a></li>
+					<li><a href="./noticeList.jsp?curPage=<%=lastNum+1%>&kind=<%=kind%>&search=<%=search%>"><span class="glyphicon glyphicon-chevron-right"></span></a></li>
 			    <%} %>
-			<li><a href="./noticeList.jsp?curPage=<%=totalPage%>"><span class="glyphicon glyphicon-forward"></span></a></li>
+			<li><a href="./noticeList.jsp?curPage=<%=totalPage%>&kind=<%=kind%>&search=<%=search%>"><span class="glyphicon glyphicon-forward"></span></a></li>
 		</ul>
 	</div>
 </div>

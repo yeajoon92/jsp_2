@@ -11,10 +11,12 @@ import com.cyj.util.DBConnector;
 public class NoticeDAO {
 	
 	//getCount 전체 글의 갯수를 가지고 옴
-	public int getCount() throws Exception {
+	public int getCount(String kind, String search) throws Exception {
 		Connection con = DBConnector.getConnect();
-		String sql = "select count(num) from notice";
+		String sql = "select count(num) from notice "
+				+ "where "+kind+" like ?";
 		PreparedStatement st = con.prepareStatement(sql);
+		st.setString(1, "%"+search+"%");
 		ResultSet rs = st.executeQuery();
 		rs.next();
 		int result = rs.getInt(1);
@@ -80,16 +82,19 @@ public class NoticeDAO {
 	}
 	
 	//selectList(descending number order)
-	public List<NoticeDTO> selectList(int startRow, int lastRow) throws Exception{
+	public List<NoticeDTO> selectList(int startRow, int lastRow, String kind, String search) throws Exception{
 		Connection con = DBConnector.getConnect();
 		String sql="select * from "
 				+ "(select rownum R, N.* from "
-				+ "(select num, title, writer, reg_date, hit from notice order by num desc) N) "
+				+ "(select num, title, writer, reg_date, hit from notice "
+				+ "where "+kind+" like ? "
+				+ "order by num desc) N) "
 				+ "where R between ? and ?";
 		PreparedStatement st = con.prepareStatement(sql);
 		
-		st.setInt(1, startRow);
-		st.setInt(2, lastRow);
+		st.setString(1, "%"+search+"%");
+		st.setInt(2, startRow);
+		st.setInt(3, lastRow);
 		
 		ResultSet rs = st.executeQuery();
 		ArrayList<NoticeDTO> ar = new ArrayList<>();
